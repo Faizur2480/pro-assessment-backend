@@ -16,4 +16,6 @@ public interface DashboardService {
 
 	Map<Object, Object> questionsActiveInactive()throws Exception;
 
+	Map<Object, Object> userProgAttemptsChart() throws Exception;
+
 }

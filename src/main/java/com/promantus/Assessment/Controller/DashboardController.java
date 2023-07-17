@@ -68,6 +68,20 @@ public class DashboardController extends CommonController {
 
 		return new HashMap<Object, Object>();
 	}
+	
+	@GetMapping("/userProgAttemptsChart")
+	public Map<Object, Object> userProgAttemptsChart(@RequestHeader(name = "lang", required = false) String lang) {
+
+		try {
+
+			return dashboardService.userProgAttemptsChart();
+
+		} catch (final Exception e) {
+			logger.error(AssessmentUtil.getErrorMessage(e));
+		}
+
+		return new HashMap<Object, Object>();
+	}
 
 	@GetMapping("/datewisePassFail/{date}")
 	public Map<Object, Object> datewisePassFail(@PathVariable String date,

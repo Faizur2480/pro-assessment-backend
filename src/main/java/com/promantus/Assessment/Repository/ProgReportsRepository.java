@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import com.promantus.Assessment.Dto.ProgReportsDto;
 import com.promantus.Assessment.Dto.ReportsDto;
 import com.promantus.Assessment.Entity.ProgReports;
+import com.promantus.Assessment.Entity.Reports;
 
 public interface ProgReportsRepository extends MongoRepository<ProgReports, String> {
 
@@ -24,7 +25,10 @@ public interface ProgReportsRepository extends MongoRepository<ProgReports, Stri
 	List<ProgReports> findByReportedOnRegex(String reportedOn);
 
 	List<ProgReports> findByUserIdAndReportedOnRegex(Long userId, String reportedOn);
+
+	List<ProgReports> findByUserId(Long id);
 	
+//	List<ProgReports> findAllByProgramLevel(String level);
 
 
 }

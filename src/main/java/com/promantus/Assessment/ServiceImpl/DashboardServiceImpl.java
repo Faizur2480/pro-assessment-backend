@@ -19,10 +19,13 @@ import com.promantus.Assessment.AssessmentConstants;
 import com.promantus.Assessment.Dto.ActiveInactiveDto;
 import com.promantus.Assessment.Dto.WidgetDto;
 import com.promantus.Assessment.Entity.GeneralQuestion;
+import com.promantus.Assessment.Entity.ProgReports;
 import com.promantus.Assessment.Entity.Reports;
 import com.promantus.Assessment.Entity.Team;
 import com.promantus.Assessment.Entity.TechQuestion;
 import com.promantus.Assessment.Repository.GeneralQuestionRepository;
+import com.promantus.Assessment.Repository.ProgReportsRepository;
+import com.promantus.Assessment.Repository.ProgramQuestionRepository;
 import com.promantus.Assessment.Repository.ReportsRepository;
 import com.promantus.Assessment.Repository.TeamRepository;
 import com.promantus.Assessment.Repository.TechQuestionRepository;
@@ -46,6 +49,9 @@ public class DashboardServiceImpl implements DashboardService {
 
 	@Autowired
 	ReportsRepository reportRepo;
+	
+	@Autowired
+	ProgReportsRepository progRepo;
 
 	@Override
 	public List<WidgetDto> widgetData() throws Exception {
@@ -122,6 +128,48 @@ public class DashboardServiceImpl implements DashboardService {
 	public Map<Object, Object> userAttemptsChart() throws Exception {
 
 		List<Reports> reportList = reportRepo.findAll();
+
+		ArrayList<String> getRecentDates = new ArrayList<>();
+		ArrayList<Integer> getRecentDatesCount = new ArrayList<>();
+		getRecentDates = DashboardServiceImpl.getRecentDates();
+		Map<Object, Object> map = new HashMap<>();
+		int count1 = 0;
+		int count2 = 0;
+		int count3 = 0;
+		int count4 = 0;
+		int count5 = 0;
+		for (int i = 0; i < reportList.size(); i++) {
+			if (getRecentDates.get(0).equals(reportList.get(i).getReportedOn().toString().split("T")[0].toString())) {
+				count1++;
+			}
+			if (getRecentDates.get(1).equals(reportList.get(i).getReportedOn().toString().split("T")[0].toString())) {
+				count2++;
+			}
+			if (getRecentDates.get(2).equals(reportList.get(i).getReportedOn().toString().split("T")[0].toString())) {
+				count3++;
+			}
+			if (getRecentDates.get(3).equals(reportList.get(i).getReportedOn().toString().split("T")[0].toString())) {
+				count4++;
+			}
+			if (getRecentDates.get(4).equals(reportList.get(i).getReportedOn().toString().split("T")[0].toString())) {
+				count5++;
+			}
+		}
+		getRecentDatesCount.add(count1);
+		getRecentDatesCount.add(count2);
+		getRecentDatesCount.add(count3);
+		getRecentDatesCount.add(count4);
+		getRecentDatesCount.add(count5);
+		map.put("dates", getRecentDates);
+		map.put("count", getRecentDatesCount);
+
+		return map;
+	}
+	
+	@Override
+	public Map<Object, Object> userProgAttemptsChart() throws Exception {
+
+		List<ProgReports> reportList = progRepo.findAll();
 
 		ArrayList<String> getRecentDates = new ArrayList<>();
 		ArrayList<Integer> getRecentDatesCount = new ArrayList<>();

@@ -1,6 +1,7 @@
 package com.promantus.Assessment.ServiceImpl;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -19,12 +20,16 @@ import com.promantus.Assessment.SmtpMailSender;
 import com.promantus.Assessment.Dto.GeneralQuestionDto;
 import com.promantus.Assessment.Dto.UserDto;
 import com.promantus.Assessment.Entity.GeneralQuestion;
+import com.promantus.Assessment.Entity.ProgReports;
 import com.promantus.Assessment.Entity.Reports;
+import com.promantus.Assessment.Entity.Settings;
 import com.promantus.Assessment.Entity.Team;
 import com.promantus.Assessment.Entity.TechQuestion;
 import com.promantus.Assessment.Entity.User;
 import com.promantus.Assessment.Repository.GeneralQuestionRepository;
+import com.promantus.Assessment.Repository.ProgReportsRepository;
 import com.promantus.Assessment.Repository.ReportsRepository;
+import com.promantus.Assessment.Repository.SettingsRepository;
 import com.promantus.Assessment.Repository.TeamRepository;
 import com.promantus.Assessment.Repository.TechQuestionRepository;
 import com.promantus.Assessment.Repository.UserRepository;
@@ -51,9 +56,15 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	ReportsRepository reportsRepository;
+	
+	@Autowired
+	ProgReportsRepository progReportsRepository;
 
 	@Autowired
 	TeamRepository teamRepository;
+	
+	@Autowired
+	SettingsRepository settingsRepository;
 
 	@Override
 	public Boolean checkUserName(String userName) throws Exception {
@@ -86,7 +97,9 @@ public class UserServiceImpl implements UserService {
 		List<GeneralQuestion> listB = new ArrayList<GeneralQuestion>();
 		listB = generalQuestionRepository.findAll();
 
-		if (listA.size() > 0 && listB.size() >= 5 && listA.size() >= 25) {
+		Settings setting =settingsRepository.findAll().get(0);
+		
+		if (listA.size() > 0 && listB.size() >= setting.getGenQns() && listA.size() >= setting.getTechQns()) {
 
 			User loginUser = userRepository.findByEmail(userDto.getEmail());
 			if (loginUser == null) {
@@ -137,8 +150,8 @@ public class UserServiceImpl implements UserService {
 				resultDto.setStatus(0);
 				resultDto.setMessage("Assessment Started");
 				return resultDto;
-			} else if (loginUser.getAttempts() != 0) {
-
+			} 
+			else if (loginUser.getAttempts() != 0) {
 				List<Reports> repObj = reportsRepository.findByUserId(loginUser.getId());
 				if (repObj.size() > 0) {
 					Comparator<Reports> reportComparator = Comparator.comparing(Reports::getReportedOn);
@@ -153,13 +166,38 @@ public class UserServiceImpl implements UserService {
 
 						return resultDto;
 					} else {
-
 						resultDto = getUserDto(loginUser);
 						resultDto.setStatus(1);
 						resultDto.setMessage("You have couple of days to attend the test, thanks for your interest");
 						return resultDto;
 					}
-				} else {
+				}
+			}
+				else if (loginUser.getProgAttempts() != 0) {
+					List<ProgReports> repObj = progReportsRepository.findByUserId(loginUser.getId());
+					if (repObj.size() > 0) {
+						Comparator<ProgReports> reportComparator = Comparator.comparing(ProgReports::getReportedOn);
+						ProgReports repMax = repObj.stream().max(reportComparator).get();
+						// System.out.println(repMax.getReportedOn());
+						DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+				        LocalDateTime dateTime = LocalDateTime.parse(repMax.getReportedOn()+"T00:00", formatter);
+				        
+						LocalDateTime reportAttemptDateTime =dateTime.plusDays(7);
+						// System.out.println(reportAttemptDateTime);
+						if (reportAttemptDateTime.isEqual(LocalDateTime.now())
+								|| reportAttemptDateTime.isBefore(LocalDateTime.now())) {
+							resultDto = getUserDto(loginUser);
+							resultDto.setMessage("You are registered to the assessment");
+
+							return resultDto;
+						} else {
+							resultDto = getUserDto(loginUser);
+							resultDto.setStatus(1);
+							resultDto.setMessage("You have couple of days to attend the test, thanks for your interest");
+							return resultDto;
+						}
+					}
+				else {
 					resultDto.setStatus(1);
 					resultDto.setMessage("Something went wrong Contact admin");
 					return resultDto;
