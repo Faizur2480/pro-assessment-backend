@@ -17,7 +17,6 @@ import com.promantus.Assessment.AssessmentConstants;
 import com.promantus.Assessment.AssessmentDefaultMethods;
 import com.promantus.Assessment.AssessmentUtil;
 import com.promantus.Assessment.SmtpMailSender;
-import com.promantus.Assessment.Dto.GeneralQuestionDto;
 import com.promantus.Assessment.Dto.UserDto;
 import com.promantus.Assessment.Entity.GeneralQuestion;
 import com.promantus.Assessment.Entity.ProgReports;
